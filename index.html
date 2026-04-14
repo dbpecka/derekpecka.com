@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Derek Pecka — Full Stack Engineering Leader</title>
+  <meta name="description" content="Derek Pecka — Full stack engineering leader with deep expertise in cloud platforms, AI, and digital solutions.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <style>
+    /* ── Reset & Base ─────────────────────────────────────── */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #0a0e14;
+      --surface: rgba(18, 24, 33, 0.75);
+      --border: rgba(58, 71, 89, 0.5);
+      --text: #b0bec5;
+      --text-bright: #e0e6ed;
+      --accent: #5ccfe6;
+      --green: #87d96c;
+      --yellow: #ffd580;
+      --magenta: #d4bfff;
+      --red: #ff6b81;
+      --orange: #ffae57;
+      --comment: #546e7a;
+      --font: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+      --glow: 0 0 20px rgba(92, 207, 230, 0.15);
+    }
+
+    html { scroll-behavior: smooth; font-size: 15px; }
+
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── Scanline overlay ─────────────────────────────────── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0, 0, 0, 0.03) 2px,
+        rgba(0, 0, 0, 0.03) 4px
+      );
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    /* ── Ambient background glow ──────────────────────────── */
+    body::after {
+      content: '';
+      position: fixed;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background:
+        radial-gradient(ellipse at 20% 50%, rgba(92, 207, 230, 0.04) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 20%, rgba(212, 191, 255, 0.03) 0%, transparent 50%),
+        radial-gradient(ellipse at 60% 80%, rgba(135, 217, 108, 0.03) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    /* ── Animated wave background ─────────────────────────── */
+    .waves-bg {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+      opacity: 0.6;
+      mask-image: radial-gradient(ellipse at center, black 35%, transparent 85%);
+      -webkit-mask-image: radial-gradient(ellipse at center, black 35%, transparent 85%);
+    }
+
+    /* Lift real content above the waves */
+    nav, .container, footer { position: relative; z-index: 1; }
+
+    ::selection {
+      background: rgba(92, 207, 230, 0.3);
+      color: var(--text-bright);
+    }
+
+    a { color: var(--accent); text-decoration: none; transition: color 0.2s; }
+    a:hover { color: var(--text-bright); text-decoration: underline; }
+
+    /* ── Layout ────────────────────────────────────────────── */
+    .container {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem;
+    }
+
+    /* ── Navigation ────────────────────────────────────────── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(16px) saturate(1.2);
+      -webkit-backdrop-filter: blur(16px) saturate(1.2);
+      background: rgba(10, 14, 20, 0.8);
+      border-bottom: 1px solid var(--border);
+      padding: 0.6rem 0;
+    }
+
+    nav .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 0;
+      padding-bottom: 0;
+    }
+
+    .nav-logo {
+      color: var(--green);
+      font-weight: 600;
+      font-size: 0.95rem;
+      letter-spacing: -0.02em;
+    }
+
+    .nav-logo .prompt { color: var(--accent); }
+
+    .nav-links { display: flex; gap: 1.5rem; }
+
+    .nav-links a {
+      color: var(--comment);
+      font-size: 0.8rem;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover { color: var(--accent); text-decoration: none; }
+
+    /* ── Terminal window component ─────────────────────────── */
+    .terminal {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-shadow: var(--glow), 0 4px 30px rgba(0, 0, 0, 0.4);
+      margin-bottom: 2rem;
+    }
+
+    .terminal-bar {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 14px;
+      background: rgba(18, 24, 33, 0.9);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .terminal-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+
+    .terminal-dot.red { background: #ff5f57; }
+    .terminal-dot.yellow { background: #febc2e; }
+    .terminal-dot.green { background: #28c840; }
+
+    .terminal-title {
+      flex: 1;
+      text-align: center;
+      font-size: 0.7rem;
+      color: var(--comment);
+      margin-right: 42px;
+    }
+
+    .terminal-body {
+      padding: 1.25rem 1.5rem;
+    }
+
+    /* ── Section styling ──────────────────────────────────── */
+    section { margin-bottom: 1rem; }
+
+    .section-cmd {
+      color: var(--comment);
+      font-size: 0.75rem;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .section-cmd .prompt-char { color: var(--green); }
+    .section-cmd .cmd { color: var(--yellow); }
+    .section-cmd .flag { color: var(--magenta); }
+    .section-cmd .arg { color: var(--text); }
+
+    /* ── Hero ──────────────────────────────────────────────── */
+    .hero-section { padding-top: 2rem; }
+
+    .ascii-name {
+      color: var(--accent);
+      font-size: 0.55rem;
+      line-height: 1.2;
+      margin-bottom: 1.5rem;
+      white-space: pre;
+      opacity: 0.9;
+    }
+
+    .hero-title {
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: var(--text-bright);
+      margin-bottom: 0.25rem;
+    }
+
+    .hero-subtitle {
+      color: var(--green);
+      font-size: 0.95rem;
+      margin-bottom: 1rem;
+    }
+
+    .hero-meta {
+      font-size: 0.8rem;
+      color: var(--comment);
+    }
+
+    .hero-meta span { margin-right: 1.5rem; }
+    .hero-meta .label { color: var(--magenta); }
+    .hero-meta .value { color: var(--text); }
+
+    .cursor {
+      display: inline-block;
+      width: 8px;
+      height: 1.1em;
+      background: var(--accent);
+      vertical-align: text-bottom;
+      animation: blink 1s step-end infinite;
+      margin-left: 2px;
+    }
+
+    @keyframes blink {
+      50% { opacity: 0; }
+    }
+
+    /* ── About ─────────────────────────────────────────────── */
+    .about-text {
+      font-size: 0.85rem;
+      line-height: 1.8;
+    }
+
+    .about-text .string { color: var(--green); }
+    .about-text .keyword { color: var(--magenta); }
+    .about-text .fn { color: var(--yellow); }
+    .about-text .comment-line { color: var(--comment); }
+
+    /* ── Experience ────────────────────────────────────────── */
+    .job {
+      margin-bottom: 1.5rem;
+      padding-left: 1rem;
+      border-left: 2px solid var(--border);
+      transition: border-color 0.3s;
+    }
+
+    .job:hover { border-left-color: var(--accent); }
+
+    .job-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 0.5rem;
+      margin-bottom: 0.3rem;
+    }
+
+    .job-title {
+      color: var(--yellow);
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .job-company {
+      color: var(--accent);
+      font-size: 0.85rem;
+    }
+
+    .job-date {
+      color: var(--comment);
+      font-size: 0.75rem;
+      margin-left: auto;
+    }
+
+    .job-location {
+      font-size: 0.75rem;
+      color: var(--comment);
+      margin-bottom: 0.4rem;
+    }
+
+    .job-desc {
+      font-size: 0.8rem;
+      color: var(--text);
+      line-height: 1.7;
+    }
+
+    .job-desc li {
+      list-style: none;
+      padding-left: 1.2rem;
+      position: relative;
+      margin-bottom: 0.25rem;
+    }
+
+    .job-desc li::before {
+      content: '→';
+      position: absolute;
+      left: 0;
+      color: var(--green);
+    }
+
+    /* ── Skills ────────────────────────────────────────────── */
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1rem;
+    }
+
+    .skill-group h3 {
+      color: var(--magenta);
+      font-size: 0.8rem;
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+    }
+
+    .skill-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+    }
+
+    .tag {
+      background: rgba(92, 207, 230, 0.08);
+      border: 1px solid rgba(92, 207, 230, 0.15);
+      color: var(--accent);
+      padding: 0.2rem 0.6rem;
+      border-radius: 4px;
+      font-size: 0.72rem;
+      transition: all 0.2s;
+    }
+
+    .tag:hover {
+      background: rgba(92, 207, 230, 0.15);
+      border-color: rgba(92, 207, 230, 0.3);
+    }
+
+    /* ── Contact ───────────────────────────────────────────── */
+    .contact-list {
+      list-style: none;
+      font-size: 0.85rem;
+    }
+
+    .contact-list li {
+      margin-bottom: 0.4rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .contact-list .key { color: var(--magenta); min-width: 100px; }
+    .contact-list .sep { color: var(--comment); }
+    .contact-list .val a { color: var(--accent); }
+
+    /* ── Footer ────────────────────────────────────────────── */
+    footer {
+      text-align: center;
+      padding: 2rem 0 3rem;
+      font-size: 0.7rem;
+      color: var(--comment);
+    }
+
+    /* ── Animations ────────────────────────────────────────── */
+    .terminal {
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeUp 0.6s ease forwards;
+    }
+
+    .terminal:nth-child(2) { animation-delay: 0.1s; }
+    .terminal:nth-child(3) { animation-delay: 0.2s; }
+    .terminal:nth-child(4) { animation-delay: 0.3s; }
+    .terminal:nth-child(5) { animation-delay: 0.4s; }
+
+    @keyframes fadeUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* ── Responsive ────────────────────────────────────────── */
+    @media (max-width: 600px) {
+      html { font-size: 14px; }
+      .ascii-name { font-size: 0.38rem; }
+      .job-header { flex-direction: column; gap: 0.15rem; }
+      .job-date { margin-left: 0; }
+      .nav-links { gap: 1rem; }
+      .hero-meta span { display: block; margin-bottom: 0.25rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Animated wave background -->
+  <canvas class="waves-bg" id="wavesBg" aria-hidden="true"></canvas>
+
+  <!-- Navigation -->
+  <nav>
+    <div class="container">
+      <div class="nav-logo"><span class="prompt">~</span> derek.pecka</div>
+      <div class="nav-links">
+        <a href="#about">about</a>
+        <a href="#experience">experience</a>
+        <a href="#skills">skills</a>
+        <a href="#contact">contact</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+
+    <!-- Hero -->
+    <section class="hero-section" id="hero">
+      <div class="terminal">
+        <div class="terminal-bar">
+          <div class="terminal-dot red"></div>
+          <div class="terminal-dot yellow"></div>
+          <div class="terminal-dot green"></div>
+          <div class="terminal-title">derek@pecka — zsh</div>
+        </div>
+        <div class="terminal-body">
+<pre class="ascii-name">
+     _              _                    _
+  __| | ___ _ __ __|_| _   _ __   ___  ___| | ____ _
+ / _` |/ _ \ '__/ _ \ | |_/ | '_ \ / _ \/ __| |/ / _` |
+| (_| |  __/ | |  __/ |   <  | |_) |  __/ (__|   < (_| |
+ \__,_|\___|_|  \___|_|_|\_\ | .__/ \___|\___|_|\_\__,_|
+                              |_|
+</pre>
+          <div class="hero-title">Derek Pecka</div>
+          <div class="hero-subtitle">Full Stack Engineering Leader</div>
+          <div class="hero-meta">
+            <span><span class="label">location</span> <span class="value">San Francisco Bay Area</span></span>
+            <span><span class="label">status</span> <span class="value">building things<span class="cursor"></span></span></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- About -->
+    <section id="about">
+      <div class="terminal">
+        <div class="terminal-bar">
+          <div class="terminal-dot red"></div>
+          <div class="terminal-dot yellow"></div>
+          <div class="terminal-dot green"></div>
+          <div class="terminal-title">cat about.md</div>
+        </div>
+        <div class="terminal-body">
+          <div class="section-cmd">
+            <span class="prompt-char">$</span>
+            <span class="cmd">cat</span>
+            <span class="arg">about.md</span>
+          </div>
+          <div class="about-text">
+            <p><span class="comment-line">// Who I am</span></p>
+            <br>
+            <p>Full stack engineering leader with deep technical expertise in cloud platforms, modern web technologies, and digital transformation. I'm passionate about building high-quality software and leading teams that deliver meaningful products.</p>
+            <br>
+            <p>Known for being proactive, detail-oriented, and a creative problem solver — I bring both strong technical chops and a collaborative mindset to every project. Whether it's architecting cloud-native systems, shipping user-facing features, or mentoring engineers, I focus on pragmatic solutions that move the needle.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Experience -->
+    <section id="experience">
+      <div class="terminal">
+        <div class="terminal-bar">
+          <div class="terminal-dot red"></div>
+          <div class="terminal-dot yellow"></div>
+          <div class="terminal-dot green"></div>
+          <div class="terminal-title">experience --verbose</div>
+        </div>
+        <div class="terminal-body">
+          <div class="section-cmd">
+            <span class="prompt-char">$</span>
+            <span class="cmd">experience</span>
+            <span class="flag">--verbose</span>
+          </div>
+
+          <div class="job">
+            <div class="job-header">
+              <span class="job-title">Engineering Leader</span>
+              <span class="job-company">@ Patelco Credit Union</span>
+              <span class="job-date">Present</span>
+            </div>
+            <div class="job-location">San Francisco Bay Area</div>
+            <ul class="job-desc">
+              <li>Leading full stack engineering initiatives for digital banking platforms</li>
+              <li>Driving cloud adoption and modern development practices across teams</li>
+              <li>Collaborating cross-functionally to deliver high-impact member-facing products</li>
+            </ul>
+          </div>
+
+          <div class="job">
+            <div class="job-header">
+              <span class="job-title">Senior Software Engineer</span>
+              <span class="job-company">@ Cupertino, CA</span>
+              <span class="job-date">Previous</span>
+            </div>
+            <div class="job-location">Cupertino, CA</div>
+            <ul class="job-desc">
+              <li>Built and scaled cloud-native applications and platform services</li>
+              <li>Delivered end-to-end features across frontend and backend systems</li>
+              <li>Championed engineering best practices, code quality, and team growth</li>
+            </ul>
+          </div>
+
+          <div class="job">
+            <div class="job-header">
+              <span class="job-title">Software Engineer</span>
+              <span class="job-company">@ Omaha, NE</span>
+              <span class="job-date">Earlier</span>
+            </div>
+            <div class="job-location">Omaha, Nebraska</div>
+            <ul class="job-desc">
+              <li>Developed production systems and honed full stack development skills</li>
+              <li>Contributed to team velocity through reliable, well-tested code</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Skills -->
+    <section id="skills">
+      <div class="terminal">
+        <div class="terminal-bar">
+          <div class="terminal-dot red"></div>
+          <div class="terminal-dot yellow"></div>
+          <div class="terminal-dot green"></div>
+          <div class="terminal-title">ls skills/</div>
+        </div>
+        <div class="terminal-body">
+          <div class="section-cmd">
+            <span class="prompt-char">$</span>
+            <span class="cmd">ls</span>
+            <span class="flag">-la</span>
+            <span class="arg">skills/</span>
+          </div>
+
+          <div class="skills-grid">
+            <div class="skill-group">
+              <h3>// languages</h3>
+              <div class="skill-tags">
+                <span class="tag">JavaScript</span>
+                <span class="tag">TypeScript</span>
+                <span class="tag">Python</span>
+                <span class="tag">SQL</span>
+                <span class="tag">HTML/CSS</span>
+                <span class="tag">Shell</span>
+              </div>
+            </div>
+            <div class="skill-group">
+              <h3>// frameworks</h3>
+              <div class="skill-tags">
+                <span class="tag">React</span>
+                <span class="tag">Node.js</span>
+                <span class="tag">Next.js</span>
+                <span class="tag">Express</span>
+                <span class="tag">REST APIs</span>
+              </div>
+            </div>
+            <div class="skill-group">
+              <h3>// cloud &amp; infra</h3>
+              <div class="skill-tags">
+                <span class="tag">AWS</span>
+                <span class="tag">Azure</span>
+                <span class="tag">Docker</span>
+                <span class="tag">CI/CD</span>
+                <span class="tag">Terraform</span>
+              </div>
+            </div>
+            <div class="skill-group">
+              <h3>// leadership</h3>
+              <div class="skill-tags">
+                <span class="tag">Team Leadership</span>
+                <span class="tag">Agile</span>
+                <span class="tag">Architecture</span>
+                <span class="tag">Mentoring</span>
+                <span class="tag">Code Review</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contact -->
+    <section id="contact">
+      <div class="terminal">
+        <div class="terminal-bar">
+          <div class="terminal-dot red"></div>
+          <div class="terminal-dot yellow"></div>
+          <div class="terminal-dot green"></div>
+          <div class="terminal-title">contact --list</div>
+        </div>
+        <div class="terminal-body">
+          <div class="section-cmd">
+            <span class="prompt-char">$</span>
+            <span class="cmd">contact</span>
+            <span class="flag">--list</span>
+          </div>
+
+          <ul class="contact-list">
+            <li>
+              <span class="key">linkedin</span>
+              <span class="sep">→</span>
+              <span class="val"><a href="https://linkedin.com/in/derekpecka" target="_blank" rel="noopener">linkedin.com/in/derekpecka</a></span>
+            </li>
+            <li>
+              <span class="key">github</span>
+              <span class="sep">→</span>
+              <span class="val"><a href="https://github.com/derekpecka" target="_blank" rel="noopener">github.com/derekpecka</a></span>
+            </li>
+            <li>
+              <span class="key">email</span>
+              <span class="sep">→</span>
+              <span class="val"><a href="mailto:hello@derekpecka.com">hello@derekpecka.com</a></span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <footer>
+    <span style="color: var(--comment);">/*</span>
+    <span style="color: var(--text);">&nbsp;built with html, css &amp; a terminal aesthetic&nbsp;</span>
+    <span style="color: var(--comment);">*/</span>
+  </footer>
+
+  <script>
+    // Flowing sine-wave background — palette-matched to the site
+    (function () {
+      const canvas = document.getElementById('wavesBg');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      let dpr = Math.min(window.devicePixelRatio || 1, 2);
+      let width = 0, height = 0;
+
+      // Hues map to --accent (cyan), --magenta, --green, --yellow
+      const waves = [
+        { amp: 36, freq: 0.0030, speed: 0.00018, offsetY: 0.26, hue: '92, 207, 230',  alpha: 0.22, width: 1.1, phase: 0.0 },
+        { amp: 52, freq: 0.0022, speed: 0.00012, offsetY: 0.44, hue: '212, 191, 255', alpha: 0.18, width: 1.2, phase: 1.4 },
+        { amp: 44, freq: 0.0026, speed: 0.00022, offsetY: 0.60, hue: '135, 217, 108', alpha: 0.14, width: 1.0, phase: 2.8 },
+        { amp: 60, freq: 0.0018, speed: 0.00009, offsetY: 0.78, hue: '255, 213, 128', alpha: 0.11, width: 1.3, phase: 4.2 },
+        { amp: 28, freq: 0.0040, speed: 0.00028, offsetY: 0.90, hue: '92, 207, 230',  alpha: 0.13, width: 0.9, phase: 0.7 }
+      ];
+
+      function resize() {
+        dpr = Math.min(window.devicePixelRatio || 1, 2);
+        width = canvas.clientWidth = window.innerWidth;
+        height = canvas.clientHeight = window.innerHeight;
+        canvas.width = Math.floor(width * dpr);
+        canvas.height = Math.floor(height * dpr);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+
+      function drawWave(w, t) {
+        ctx.beginPath();
+        const baseY = height * w.offsetY;
+        const step = 6;
+        for (let x = 0; x <= width; x += step) {
+          const y = baseY
+            + Math.sin(x * w.freq + t * w.speed + w.phase) * w.amp
+            + Math.sin(x * w.freq * 2.3 + t * w.speed * 1.6 + w.phase) * (w.amp * 0.28);
+          if (x === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        }
+        const grad = ctx.createLinearGradient(0, 0, width, 0);
+        grad.addColorStop(0,    `rgba(${w.hue}, 0)`);
+        grad.addColorStop(0.15, `rgba(${w.hue}, ${w.alpha})`);
+        grad.addColorStop(0.85, `rgba(${w.hue}, ${w.alpha})`);
+        grad.addColorStop(1,    `rgba(${w.hue}, 0)`);
+        ctx.strokeStyle = grad;
+        ctx.lineWidth = w.width;
+        ctx.shadowColor = `rgba(${w.hue}, ${w.alpha * 0.9})`;
+        ctx.shadowBlur = 12;
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+      }
+
+      function render(t) {
+        ctx.clearRect(0, 0, width, height);
+        for (const w of waves) drawWave(w, t);
+        if (!prefersReduced) requestAnimationFrame(render);
+      }
+
+      resize();
+      window.addEventListener('resize', resize, { passive: true });
+      if (prefersReduced) render(0);
+      else requestAnimationFrame(render);
+    })();
+  </script>
+
+</body>
+</html>
